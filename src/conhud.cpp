@@ -23,6 +23,10 @@ struct image_data {
 };
 
 Globals global;
+#ifndef DISABLE_LEAPMOTION
+Leap_hands_data leap_hands_data;
+#endif
+
 void edgeFilter(cv::Mat* image);
 void printHelp();
 
@@ -35,14 +39,14 @@ void printHelp();
 int main(int argc, char* argv[]) {
 
   std::string filename = "0";
-//std::string names_file = "darknet/data/voc.names";
-//std::string cfg_file = "darknet/cfg/tiny-yolo-voc.cfg";
-//std::string weights_file = "darknet/tiny-yolo-voc.weights";
+std::string names_file = "darknet/data/voc.names";
+std::string cfg_file = "darknet/cfg/tiny-yolo-voc.cfg";
+std::string weights_file = "darknet/tiny-yolo-voc.weights";
 //std::string cfg_file = "darknet/cfg/yolo-voc.cfg";
 //std::string weights_file = "darknet/yolo-voc.weights";
-  std::string names_file = "darknet/data/custom.names";
-  std::string cfg_file = "darknet/cfg/yolo-voc.2.0.cfg";
-  std::string weights_file = "darknet/yolo-voc_custom.weights";
+//std::string names_file = "darknet/data/custom.names";
+//std::string cfg_file = "darknet/cfg/yolo-voc.2.0.cfg";
+//std::string weights_file = "darknet/yolo-voc_custom.weights";
 
 /*used for limiting clock speed*/
   const int FPS = 30;
@@ -173,6 +177,12 @@ int main(int argc, char* argv[]) {
 //capture.set(CV_CAP_PROP_FRAME_WIDTH, 1280);
 //capture.set(CV_CAP_PROP_FRAME_HEIGHT, 720);
 
+  std::string player_name = "player1";
+  float text_scale = 0.8;
+  int text_thickness = 2;
+  int baseline = 0;
+  cv::Size name_size = cv::getTextSize(player_name, cv::FONT_HERSHEY_COMPLEX_SMALL, text_scale, text_thickness, &baseline);
+
   cv::Mat capt_frame, gray_image, contours;
 
   capture >> capt_frame;
@@ -211,7 +221,6 @@ int main(int argc, char* argv[]) {
 
     next_frame += std::chrono::milliseconds(FRAME_DELAY);
 
-
     handleEvents();
 
     if (!image_queue.empty()) {
@@ -221,9 +230,11 @@ int main(int argc, char* argv[]) {
 
 #ifndef DISABLE_DARKNET
 /*detect objects and draw a box around them*/
-      std::vector<bbox_t> result_vec = detector.detect(pros_image.frame);
-      drawBoxes(pros_image.frame, result_vec, object_names);
-//    showConsoleResult(result_vec, object_names);    //uncomment this if you want console feedback
+      if (global.flags.enable_detection) {
+        std::vector<bbox_t> result_vec = detector.detect(pros_image.frame);
+        drawBoxes(pros_image.frame, result_vec, object_names);
+//      showConsoleResult(result_vec, object_names);    //uncomment this if you want console feedback
+      }
 #endif
 
       if (global.flags.edge_filter) { edgeFilter(&pros_image.frame); }
@@ -234,7 +245,10 @@ int main(int argc, char* argv[]) {
 
         putText(pros_image.frame, timeText, cv::Point(frame_size.width-230,frame_size.height-150), cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, cv::Scalar(0,255,0), 2);
       }
-      if (global.flags.display_name) { putText(pros_image.frame, "player1", cv::Point(frame_size.width/2, 50), cv::FONT_HERSHEY_COMPLEX_SMALL, 0.8, cv::Scalar(0,255,0), 2); }
+#ifndef DISABLE_LEAPMOTION
+      if (global.flags.draw_fingers) { drawLeapFingerTip(leap_controller, pros_image.frame); }
+#endif
+      if (global.flags.display_name) { putText(pros_image.frame, player_name, cv::Point((frame_size.width/2)-name_size.width/2, 50), cv::FONT_HERSHEY_COMPLEX_SMALL, text_scale, cv::Scalar(0,255,0), text_thickness); }
       if (global.flags.flip_image) { cv::flip(pros_image.frame, pros_image.frame, 0); }
 
 /*update and render video feed*/
@@ -270,7 +284,6 @@ int main(int argc, char* argv[]) {
 #ifndef DISABLE_LEAPMOTION
   leap_controller.removeListener(listener);
 #endif
-
   std::printf("Program exited\n");
 
   return EXIT_SUCCESS;
@@ -302,6 +315,7 @@ void edgeFilter(cv::Mat* image) {
   }
 }
 
+//TODO
 void printHelp() {
   std::printf("help\n");
 }

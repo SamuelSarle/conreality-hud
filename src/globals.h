@@ -26,6 +26,10 @@
 #include <unistd.h>
 #include <tbb/concurrent_queue.h>
 
+#ifndef DISABLE_LEAPMOTION
+#include "Leap.h"
+#endif
+
 #ifndef DISABLE_OSVR
 #include <osvr/ClientKit/ClientKit.h>
 #include <osvr/ClientKit/Display.h>
@@ -45,11 +49,19 @@ struct js_control_input {
    const float* axes;
 };
 
+#ifndef DISABLE_LEAPMOTION
+struct Leap_hands_data {
+  Leap::HandList hands;
+};
+#endif
+
 struct Globals {
 
   struct {
     bool is_running = true;
+    bool enable_detection = false;
     bool show_items = false;
+    bool draw_fingers = false;
     bool flip_image = false;
     bool edge_filter = false;
     bool edge_filter_ext = false;

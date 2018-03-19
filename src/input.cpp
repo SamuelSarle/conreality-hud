@@ -54,6 +54,12 @@ void handleEvents() {
       case GLFW_KEY_ESCAPE:
         global.flags.is_running = false;
         break;
+      case GLFW_KEY_A:
+        global.flags.draw_fingers = !(global.flags.draw_fingers);
+        break;
+      case GLFW_KEY_D:
+        global.flags.enable_detection = !(global.flags.enable_detection);
+        break;
       case GLFW_KEY_E:
         if (kb_event.modifiers == GLFW_MOD_SHIFT) {
           if (global.flags.edge_filter == false) { global.flags.edge_filter = true; }
