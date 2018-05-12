@@ -272,6 +272,22 @@ int main(int argc, char* argv[]) {
       image_queue.try_pop(pros_image);
       if (pros_image.left_frame.empty() || pros_image.right_frame.empty()) { std::printf("Video feed has ended\n"); global.flags.is_running = false; }
 
+#ifndef DISABLE_DARKNET
+/*detect objects and draw a box around them*/
+      if (global.flags.enable_detection) {
+        if (to_detect) {
+          result_vec = detector.detect(pros_image.right_frame);
+        }
+        drawBoxes(pros_image.right_frame, result_vec, object_names);
+      //  showConsoleResult(result_vec, object_names);    //uncomment this if you want console feedback
+        if (to_detect) {
+          result_vec = detector.detect(pros_image.left_frame);
+        }
+        drawBoxes(pros_image.left_frame, result_vec, object_names);
+        to_detect = !to_detect;
+      }
+#endif
+
 #ifndef DISABLE_OSVR
       ctx.update();
       if (global.flags.fullscreen) { render(display, pros_image.left_frame, pros_image.right_frame, texture, window_w, window_h); }
@@ -281,6 +297,7 @@ int main(int argc, char* argv[]) {
 #else
       drawToGLFW(pros_image.right_frame, texture, window_w, window_h);
 #endif
+
       glfwSwapBuffers(window);
       glfwPollEvents();
     }
