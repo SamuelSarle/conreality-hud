@@ -63,6 +63,7 @@ AX_ARG_ENABLE_FEATURE([leapmotion], [LeapMotion support]) # --enable-leapmotion/
 AX_ARG_ENABLE_FEATURE([openhmd], [OpenHMD support]) # --enable-openhmd/--disable-openhmd
 AX_ARG_ENABLE_FEATURE([openvr],  [OpenVR support])  # --enable-openvr/--disable-openvr
 AX_ARG_ENABLE_FEATURE([osvr],    [OSVR support])    # --enable-osvr/--disable-osvr
+AX_ARG_ENABLE_FEATURE([stereo],  [Stereo support])    # --enable-stereo/--disable-stereo
 
 dnl Check for programs:
 AC_PROG_CXX(clang++ g++ c++)
