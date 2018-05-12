@@ -247,7 +247,7 @@ int main(int argc, char* argv[]) {
   }
 
   bool to_detect = true;
-#ifndef DISABLE_DARKET
+#ifndef DISABLE_DARKNET
   std::vector<bbox_t> result_vec;
 #endif
 
