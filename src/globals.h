@@ -50,8 +50,9 @@ struct js_control_input {
 };
 
 #ifndef DISABLE_LEAPMOTION
-struct Leap_hands_data {
+struct Leap_data {
   Leap::HandList hands;
+  Leap::ImageList images;
 };
 #endif
 
@@ -71,6 +72,9 @@ struct Globals {
     bool fullscreen = true;
     bool save_output_videofile = false;
   } flags;
+
+  time_t rawtime;
+  cv::Size frame_size;
 
   tbb::concurrent_bounded_queue<kb_control_input> kb_control_queue;
   tbb::concurrent_bounded_queue<ms_control_input> ms_control_queue;
