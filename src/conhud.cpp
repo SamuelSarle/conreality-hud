@@ -249,6 +249,7 @@ int main(int argc, char* argv[]) {
   bool to_detect = true;
 #ifndef DISABLE_DARKNET
   std::vector<bbox_t> result_vec;
+  std::vector<bbox_t> result_vec2;
 #endif
 
 /**************
@@ -277,16 +278,23 @@ int main(int argc, char* argv[]) {
       if (global.flags.enable_detection) {
         if (to_detect) {
           result_vec = detector.detect(pros_image.right_frame);
+          result_vec2 = detector.detect(pros_image.left_frame);
         }
         drawBoxes(pros_image.right_frame, result_vec, object_names);
-      //  showConsoleResult(result_vec, object_names);    //uncomment this if you want console feedback
-        if (to_detect) {
-          result_vec = detector.detect(pros_image.left_frame);
-        }
-        drawBoxes(pros_image.left_frame, result_vec, object_names);
+        drawBoxes(pros_image.left_frame, result_vec2, object_names);
+      //  showConsoleResult(result_vec, object_names);    //uncomment these if you want console feedback
+      //  showConsoleResult(result_vec2, object_names);
+
         to_detect = !to_detect;
       }
 #endif
+      applyFilters(&pros_image.right_frame);
+      applyFilters(&pros_image.left_frame);
+
+      if (global.flags.display_name) {
+        putText(pros_image.right_frame, player_name, cv::Point((global.frame_size.width/2)-name_size.width/2, 50), cv::FONT_HERSHEY_COMPLEX_SMALL, text_scale, cv::Scalar(0,255,0), text_thickness);
+        putText(pros_image.left_frame, player_name, cv::Point((global.frame_size.width/2)-name_size.width/2, 50), cv::FONT_HERSHEY_COMPLEX_SMALL, text_scale, cv::Scalar(0,255,0), text_thickness);
+      }
 
 #ifndef DISABLE_OSVR
       ctx.update();
@@ -300,6 +308,10 @@ int main(int argc, char* argv[]) {
 
       glfwSwapBuffers(window);
       glfwPollEvents();
+
+      if (output_video.isOpened() && global.flags.save_output_videofile) {
+        output_video << pros_image.right_frame;
+      }
     }
 
 ///////////////////////////////////////
@@ -325,9 +337,6 @@ int main(int argc, char* argv[]) {
       }
 #endif
 
-#ifndef DISABLE_LEAPMOTION
-      if (global.flags.draw_fingers) { drawLeapFingerTip(leap_controller, pros_image.frame); }
-#endif
       if (global.flags.display_name) { putText(pros_image.frame, player_name, cv::Point((global.frame_size.width/2)-name_size.width/2, 50), cv::FONT_HERSHEY_COMPLEX_SMALL, text_scale, cv::Scalar(0,255,0), text_thickness); }
 
 /*update and render video feed*/
