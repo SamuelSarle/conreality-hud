@@ -12,9 +12,10 @@ public:
   virtual void onConnect(const Leap::Controller&);
   virtual void onDisconnect(const Leap::Controller&);
   virtual void onFrame(const Leap::Controller&);
+  virtual void onImages(const Leap::Controller&);
 };
 
 Leap::Vector convertCoords(cv::Mat image, Leap::Finger finger);
-void drawLeapFingerTip(const Leap::Controller&, cv::Mat image);
+void drawLeapFingerTip(const Leap::Controller& controller, cv::Mat image);
 
 #endif //LEAPFUNCS_H

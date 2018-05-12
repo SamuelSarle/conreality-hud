@@ -19,12 +19,12 @@ conhud_LDADD  += $(TBB_LIBS)
 
 # FIXME
 if !DISABLE_DARKNET
-  conhud_LDADD += -l:darknet.so
+  conhud_LDADD   += -l:darknet.so
   conhud_SOURCES += darknet.cpp
 endif
 
 if !DISABLE_LEAPMOTION
-  conhud_LDADD  += -l:libLeap.so
+  conhud_LDADD   += -l:libLeap.so
   conhud_SOURCES += leapfuncs.cpp
 endif
 
